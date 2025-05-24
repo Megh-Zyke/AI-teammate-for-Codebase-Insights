@@ -1,6 +1,5 @@
-import os
 from server.api.services.llm_utils import describe_and_classify_chunk_gemini
-
+import os
 def list_code_files(base_path, extensions={".py", ".js", ".ts", ".jsx"}):
     code_files = []
     for root, _, files in os.walk(base_path):
@@ -64,3 +63,11 @@ def classify_all_files(repo_path):
             })
 
     return results
+
+# if __name__ == "__main__":
+#     print("hi")
+#     repo_path = "data/user_repos/cloned"  # Replace with your actual repo path
+#     results = classify_all_files(repo_path)
+
+#     for result in results[:5]: 
+#         print(result)
