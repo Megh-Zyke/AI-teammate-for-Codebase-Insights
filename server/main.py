@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from server.api import upload, analyse 
+from server.api import upload, analyse ,parse
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -15,3 +15,4 @@ app.add_middleware(
 
 app.include_router(upload.router, prefix="/api")
 app.include_router(analyse.router, prefix="/api")
+app.include_router(parse.router, prefix="/api")
