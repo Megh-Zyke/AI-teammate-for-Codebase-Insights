@@ -12,3 +12,5 @@ def get_db_connection():
         host=os.getenv("PG_HOST", "localhost"),
         port=os.getenv("PG_PORT", 5432)
     )
+
+# print(get_db_connection())

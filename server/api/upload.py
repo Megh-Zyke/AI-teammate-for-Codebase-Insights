@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import os, zipfile
 from pathlib import Path
+from api.services.enricher import *
 
 router = APIRouter()
 
@@ -25,11 +26,16 @@ async def upload_zip(file: UploadFile = File(...)):
     try:
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(extract_dir)
+
     except zipfile.BadZipFile:
         raise HTTPException(status_code=400, detail="Corrupted ZIP file")
 
-    return {
-        "status": "success",
-        "repo_name": extract_dir.name,
-        "path": str(extract_dir)
-    }
+    try:
+        results = enrich_and_store(str(extract_dir))
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+    
+    # Prepare the response
+    results["status"] = "success"
+    results["repo"] = extract_dir.name
+    return results

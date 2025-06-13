@@ -58,16 +58,16 @@ function getLayoutedGraph(nodes, edges, direction = "TB") {
 }
 
 export default function OutputDisplay({ output }) {
-  const layouted = useMemo(() => {
-    if (output?.graph?.nodes && output?.graph?.edges) {
-      const layoutedNodes = getLayoutedGraph(
-        output.graph.nodes,
-        output.graph.edges
-      );
-      return { nodes: layoutedNodes, edges: output.graph.edges };
-    }
-    return null;
-  }, [output]);
+  // const layouted = useMemo(() => {
+  //   if (output?.graph?.nodes && output?.graph?.edges) {
+  //     const layoutedNodes = getLayoutedGraph(
+  //       output.graph.nodes,
+  //       output.graph.edges
+  //     );
+  //     return { nodes: layoutedNodes, edges: output.graph.edges };
+  //   }
+  //   return null;
+  // }, [output]);
 
   return (
     <>
@@ -82,9 +82,10 @@ export default function OutputDisplay({ output }) {
           }}
         >
           {JSON.stringify(output?.status ?? {}, null, 2)}
+          {JSON.stringify(output?.repo ?? {}, null, 2)}
         </pre>
       </div>
-
+      {/* 
       {layouted && (
         <div style={{ width: "100%", height: "90vh" }}>
           <ReactFlow
@@ -96,7 +97,7 @@ export default function OutputDisplay({ output }) {
             zoomOnScroll
           />
         </div>
-      )}
+      )} */}
     </>
   );
 }

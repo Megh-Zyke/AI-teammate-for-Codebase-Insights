@@ -3,12 +3,15 @@ import { useState } from "react";
 
 export default function RepoCloner({ setOutput }) {
   const [url, setUrl] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleClone = async () => {
+    setLoading(true);
     const res = await axios.post("http://localhost:8000/api/clone/", {
       repo_url: url,
     });
     setOutput(res.data);
+    setLoading(false);
   };
 
   return (
@@ -18,7 +21,9 @@ export default function RepoCloner({ setOutput }) {
         placeholder="GitHub Repo URL"
         onChange={(e) => setUrl(e.target.value)}
       />
-      <button onClick={handleClone}>Clone Repo</button>
+      <button onClick={handleClone}>
+        {loading ? <span>Cloning...</span> : <span>Clone Repo</span>}
+      </button>
     </div>
   );
 }

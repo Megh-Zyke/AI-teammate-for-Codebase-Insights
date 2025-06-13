@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from server.api.services.parser import get_all_chunks_from_repo
+from api.services.parser import get_all_chunks_from_repo
 
 router = APIRouter()
 

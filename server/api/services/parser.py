@@ -1,4 +1,4 @@
-from server.api.services.llm_utils import describe_and_classify_chunk_gemini
+from api.services.llm_utils import describe_and_classify_chunk_gemini
 import os
 def list_code_files(base_path, extensions={".py", ".js", ".ts", ".jsx"}):
     code_files = []
