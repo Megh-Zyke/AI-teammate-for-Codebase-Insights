@@ -129,5 +129,6 @@ def enrich_and_store(repo_path: str):
     return {
         "status": "success",
         "file_count": len(results),
-        "graph_saved_to": graph_file_path
+        "graph_saved_to": graph_file_path,
+        "graph": graph,
     }
