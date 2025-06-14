@@ -14,7 +14,7 @@ function App() {
       <FileUploader setOutput={setOutput} />
       <RepoCloner setOutput={setOutput} />
       <RoleSelector role={role} setRole={setRole} />
-      <OutputDisplay output={output} />
+      <OutputDisplay output={output} role={role} />
     </div>
   );
 }

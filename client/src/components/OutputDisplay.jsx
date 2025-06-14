@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import ReactFlow, { Handle, Position } from "reactflow";
 import dagre from "dagre";
 import "reactflow/dist/style.css";
@@ -7,9 +7,38 @@ import "../css/nodeStyles.css";
 const nodeWidth = 80;
 const nodeHeight = 80;
 
-const CircularNode = ({ data }) => {
+const CircularNode = ({ data, selected }) => {
+  const getColor = () => {
+    if (selected) return "#ec4899"; // pink
+    if (data.role !== data.category) return "#d1d5db"; // gray if not matching role
+    switch (data.category) {
+      case "frontend":
+        return "#3b82f6"; // blue
+      case "backend":
+        return "#10b981"; // green
+      case "ai":
+        return "#facc15"; // yellow
+      default:
+        return "#9ca3af"; // default gray
+    }
+  };
+
   return (
-    <div className="circular-node">
+    <div
+      className="circular-node"
+      style={{
+        backgroundColor: getColor(),
+        borderRadius: "50%",
+        width: 80,
+        height: 80,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#fff",
+        fontWeight: "bold",
+        boxShadow: selected ? "0 0 0 3px #ec4899aa" : "0 0 4px #00000033",
+      }}
+    >
       {data.label}
       <Handle type="source" position={Position.Bottom} />
       <Handle type="target" position={Position.Top} />
@@ -21,7 +50,7 @@ const nodeTypes = {
   circular: CircularNode,
 };
 
-function getLayoutedGraph(nodes, edges, direction = "TB") {
+function getLayoutedGraph(nodes, edges, role, direction = "TB") {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
   dagreGraph.setGraph({ rankdir: direction });
@@ -48,22 +77,25 @@ function getLayoutedGraph(nodes, edges, direction = "TB") {
         ...node.data,
         abs_path: node.data.abs_path || "",
         repo_path: node.data.repo_path || "",
+        role,
       },
     };
   });
 }
 
-export default function OutputDisplay({ output }) {
+export default function OutputDisplay({ output, role }) {
   const layouted = useMemo(() => {
     if (output?.graph?.nodes && output?.graph?.edges) {
       const layoutedNodes = getLayoutedGraph(
         output.graph.nodes,
-        output.graph.edges
+        output.graph.edges,
+        role
       );
+
       return { nodes: layoutedNodes, edges: output.graph.edges };
     }
     return null;
-  }, [output]);
+  }, [output, role]);
 
   const [selectedNode, setSelectedNode] = useState(null);
 

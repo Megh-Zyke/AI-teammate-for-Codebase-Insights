@@ -47,8 +47,6 @@ def enrich_and_store(repo_path: str):
     conn = get_db_connection()
     cur = conn.cursor()
 
-
-    print(len(results), "files classified")
     filename_type = {
         result.get("file_path"): result.get("category")
         for result in results
