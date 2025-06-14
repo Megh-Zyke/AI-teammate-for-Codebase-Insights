@@ -76,8 +76,10 @@ def enrich_and_store(repo_path: str):
     print(f"Graph saved to {graph_file_path}")
 
     # 🗃️ Store file-level enrichment
-    table_name = os.path.basename(repo_path)
+    table_name = os.path.basename(repo_path).replace("-", "_").replace(" ", "_").lower()
+    # Ensure table name is valid for SQL
 
+    # Create table if it doesn't exist
     create_table_query = f"""
         CREATE TABLE IF NOT EXISTS "{table_name}" (
             id SERIAL PRIMARY KEY,
@@ -91,6 +93,11 @@ def enrich_and_store(repo_path: str):
     """
     cur.execute(create_table_query)
 
+    # Truncate table if it exists
+    truncate_query = f'TRUNCATE TABLE "{table_name}";'
+
+    cur.execute(truncate_query)
+
     for result in results:
         try:
             cur.execute(
@@ -100,7 +107,7 @@ def enrich_and_store(repo_path: str):
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """,
                 (
-                    result.get("file_path"),
+                    result.get("file_path").replace("\\", "/"), 
                     result.get("file_name"),
                     result.get("category"),
                     result.get("description"),
@@ -117,6 +124,8 @@ def enrich_and_store(repo_path: str):
         graph_insert_query = """
             INSERT INTO graph_table (repo_name, repo_graph)
             VALUES (%s, %s)
+            ON CONFLICT (repo_name)
+            DO UPDATE SET repo_graph = EXCLUDED.repo_graph
         """
         cur.execute(graph_insert_query, (table_name, json.dumps(graph)))
     except Exception as e:
