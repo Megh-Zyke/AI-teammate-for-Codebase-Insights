@@ -1,11 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
 from api.services.db import get_db_connection
 
 router = APIRouter()
 
 @router.get("/file_info/")
-def get_file_info(path:str ,label : str , table: str):
-
+def get_file_info(path: str, label: str, table: str):
     """
     Get file information for a given path from the database
     """
@@ -19,15 +19,22 @@ def get_file_info(path:str ,label : str , table: str):
     cursor.close()
     conn.close()
     
-    return {
-        "file_path" : file_info[1],
-        "file_name" : file_info[2],
-        "file_category" : file_info[3],
-        "ai_description" : file_info[4],
-        "complexity" : file_info[5],
-        "key_components" : file_info[6]
-    }
+    if not file_info:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "File not found in the database"}
+        )
 
+    return JSONResponse(
+        status_code= 200,
+        content={
+        "file_path": file_info[1],
+        "file_name": file_info[2],
+        "file_category": file_info[3],
+        "ai_description": file_info[4],
+        "complexity": file_info[5],
+        "key_components": file_info[6]
+    })
 
 
 # path = "./data/user_repos/MiniShell/main.cpp"

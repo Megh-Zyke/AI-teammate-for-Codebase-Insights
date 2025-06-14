@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import ReactFlow, { Handle, Position } from "reactflow";
+import axios from "axios";
 import dagre from "dagre";
 import "reactflow/dist/style.css";
 import "../css/nodeStyles.css";
@@ -98,26 +99,37 @@ export default function OutputDisplay({ output, role }) {
   }, [output, role]);
 
   const [selectedNode, setSelectedNode] = useState(null);
+  const [fileInfo, setFileInfo] = useState(null);
 
+  useEffect(() => {
+    if (selectedNode?.repo_path && selectedNode?.label) {
+      const parts = selectedNode.repo_path.replace(/\\/g, "/").split("/");
+      const repoName = parts[parts.indexOf("user_repos") + 1]
+        ?.toLowerCase()
+        .replace("-", "_");
+      const label = selectedNode.label;
+      const filePath = selectedNode.repo_path.replace(/\\/g, "/");
+
+      axios
+        .get("http://localhost:8000/api/file_info/", {
+          params: {
+            path: filePath,
+            label: label,
+            table: repoName,
+          },
+        })
+        .then((res) => {
+          setFileInfo(res.data);
+          console.log("File info fetched:", res.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching file info:", err);
+          setFileInfo(null);
+        });
+    }
+  }, [selectedNode]);
   return (
     <>
-      {selectedNode && (
-        <div
-          style={{
-            marginTop: "1rem",
-            padding: "1rem",
-            backgroundColor: "#fffbe6",
-            border: "1px solid #facc15",
-            borderRadius: "8px",
-          }}
-        >
-          <h3>Node Info</h3>
-          <pre style={{ fontSize: "0.9rem" }}>
-            {JSON.stringify(selectedNode, null, 2)}
-          </pre>
-        </div>
-      )}
-
       <div style={{ padding: "1rem" }}>
         <pre
           style={{
@@ -134,7 +146,7 @@ export default function OutputDisplay({ output, role }) {
       </div>
 
       {layouted && (
-        <div style={{ width: "100%", height: "90vh" }}>
+        <div style={{ width: "100%", height: "30vh" }}>
           <ReactFlow
             nodes={layouted.nodes}
             edges={layouted.edges}
@@ -144,6 +156,23 @@ export default function OutputDisplay({ output, role }) {
             zoomOnScroll
             onNodeClick={(event, node) => setSelectedNode(node.data)}
           />
+        </div>
+      )}
+
+      {fileInfo && (
+        <div
+          style={{
+            marginTop: "1rem",
+            padding: "1rem",
+            backgroundColor: "#f3f4f6",
+            border: "1px solid #d1d5db",
+            borderRadius: "8px",
+          }}
+        >
+          <h3>File Info</h3>
+          <pre style={{ fontSize: "0.9rem" }}>
+            {JSON.stringify(fileInfo, null, 2)}
+          </pre>
         </div>
       )}
     </>
