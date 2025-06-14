@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException
+import os
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from api.services.db import get_db_connection
 
 router = APIRouter()
 
 @router.get("/file_info/")
-def get_file_info(path: str, label: str, table: str):
+def get_file_info(path: str, label: str, table: str , abs_path = str):
     """
     Get file information for a given path from the database
     """
@@ -24,6 +25,25 @@ def get_file_info(path: str, label: str, table: str):
             status_code=404,
             content={"message": "File not found in the database"}
         )
+    
+    if not os.path.exists(abs_path):
+        return JSONResponse(
+            status_code=404,
+            content={"message": "File does not exist on the server"}
+        )
+    try:
+        with open(abs_path, 'r', encoding='utf-8', errors='ignore') as file:
+            content = file.read()
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"message": f"Error reading file: {str(e)}"}
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"message": f"Error reading file: {str(e)}"}
+        )    
 
     return JSONResponse(
         status_code= 200,
@@ -33,7 +53,8 @@ def get_file_info(path: str, label: str, table: str):
         "file_category": file_info[3],
         "ai_description": file_info[4],
         "complexity": file_info[5],
-        "key_components": file_info[6]
+        "key_components": file_info[6],
+        "content": content
     })
 
 
