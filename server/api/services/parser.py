@@ -1,6 +1,6 @@
 from api.services.llm_utils import describe_and_classify_chunk_gemini
 import os
-def list_code_files(base_path, extensions={".py", ".js", ".ts", ".jsx"}):
+def list_code_files(base_path, extensions={".py", ".js", ".ts", ".jsx" , ".cpp", ".java", ".go", ".rb", ".php", ".html", ".css"}):
     code_files = []
     for root, _, files in os.walk(base_path):
         for file in files:
@@ -45,7 +45,7 @@ def classify_all_files(repo_path):
             category, description, complexity , key_components = describe_and_classify_chunk_gemini(content)
 
             results.append({
-                "file_path": file,
+                "file_path": file.replace("/" , "\\"),
                 "file_name": os.path.basename(file),
                 "category": category,
                 "description": description,
@@ -56,7 +56,7 @@ def classify_all_files(repo_path):
         except Exception as e:
             print(f"Failed to process {file}: {e}")
             results.append({
-                "file_path": file,
+                "file_path": file.replace("/" , "\\"),
                 "file_name": os.path.basename(file),
                 "category": "unknown",
                 "description": f"Error: {str(e)}"
@@ -66,7 +66,7 @@ def classify_all_files(repo_path):
 
 # if __name__ == "__main__":
 #     print("hi")
-#     repo_path = "data/user_repos/cloned"  # Replace with your actual repo path
+#     repo_path = "data/user_repos/MiniShell"  # Replace with your actual repo path
 #     results = classify_all_files(repo_path)
 
 #     for result in results[:5]: 

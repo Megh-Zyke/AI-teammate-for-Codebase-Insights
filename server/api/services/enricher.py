@@ -13,30 +13,31 @@ def build_graph_tree(path, filename_type, parent_id=None, counter={"id": 0}):
         return f"node-{counter['id']}"
 
     for item in os.listdir(path):
-        full_path = os.path.join(path, item)
-        category = filename_type.get(full_path, "unknown")
-        node_id = get_id()
+        if not item.startswith('.'):
+            full_path = os.path.join(path, item)
+            category = filename_type.get(full_path.replace("C:\\Users\\megha\\Documents\\Holboxathon\\server", ".").replace("/", "\\"), "unknown")
+            node_id = get_id()
 
-        node = {
-            "id": node_id,
-            "data": {"label": item, "category": category},
-            "type": "default",
-            "position": {"x": 0, "y": 0}
-        }
+            node = {
+                "id": node_id,
+                "data": {"label": item, "abs_path": os.path.abspath(full_path).replace("/", "\\"), "repo_path": full_path.replace("C:\\Users\\megha\\Documents\\Holboxathon\\server", ".").replace("/", "\\") , "category": category},
+                "type": "default",
+                "position": {"x": 0, "y": 0}
+            }
 
-        nodes.append(node)
+            nodes.append(node)
 
-        if parent_id:
-            edges.append({
-                "id": f"e{parent_id}-{node_id}",
-                "source": parent_id,
-                "target": node_id
-            })
+            if parent_id:
+                edges.append({
+                    "id": f"e{parent_id}-{node_id}",
+                    "source": parent_id,
+                    "target": node_id
+                })
 
-        if os.path.isdir(full_path):
-            child_nodes, child_edges = build_graph_tree(full_path, filename_type, node_id, counter)
-            nodes.extend(child_nodes)
-            edges.extend(child_edges)
+            if os.path.isdir(full_path):
+                child_nodes, child_edges = build_graph_tree(full_path, filename_type, node_id, counter)
+                nodes.extend(child_nodes)
+                edges.extend(child_edges)
 
     return nodes, edges
 
@@ -46,10 +47,13 @@ def enrich_and_store(repo_path: str):
     conn = get_db_connection()
     cur = conn.cursor()
 
+
+    print(len(results), "files classified")
     filename_type = {
         result.get("file_path"): result.get("category")
         for result in results
     }
+
 
     # 🌳 Build graph
     root_path = os.path.abspath(repo_path)
@@ -57,7 +61,7 @@ def enrich_and_store(repo_path: str):
 
     nodes = [{
         "id": root_id,
-        "data": {"label": os.path.basename(repo_path)},
+        "data": {"label": os.path.basename(repo_path) , "abs_path" : root_path.replace("/" , "\\")  , "repo_path" : repo_path.replace("/" , "\\") },
         "position": {"x": 0, "y": 0}
     }]
     child_nodes, child_edges = build_graph_tree(root_path, filename_type, root_id)

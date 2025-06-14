@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo, useState } from "react";
 import ReactFlow, { Handle, Position } from "reactflow";
 import dagre from "dagre";
 import "reactflow/dist/style.css";
@@ -46,12 +46,8 @@ function getLayoutedGraph(nodes, edges, direction = "TB") {
       targetPosition: "top",
       data: {
         ...node.data,
-        label:
-          node.data.label.startsWith("📁") || node.data.label.startsWith("📄")
-            ? node.data.label
-            : node.data.type === "directory"
-            ? `📁 ${node.data.label}`
-            : `📄 ${node.data.label}`,
+        abs_path: node.data.abs_path || "",
+        repo_path: node.data.repo_path || "",
       },
     };
   });
@@ -69,8 +65,27 @@ export default function OutputDisplay({ output }) {
     return null;
   }, [output]);
 
+  const [selectedNode, setSelectedNode] = useState(null);
+
   return (
     <>
+      {selectedNode && (
+        <div
+          style={{
+            marginTop: "1rem",
+            padding: "1rem",
+            backgroundColor: "#fffbe6",
+            border: "1px solid #facc15",
+            borderRadius: "8px",
+          }}
+        >
+          <h3>Node Info</h3>
+          <pre style={{ fontSize: "0.9rem" }}>
+            {JSON.stringify(selectedNode, null, 2)}
+          </pre>
+        </div>
+      )}
+
       <div style={{ padding: "1rem" }}>
         <pre
           style={{
@@ -95,6 +110,7 @@ export default function OutputDisplay({ output }) {
             fitView
             panOnDrag
             zoomOnScroll
+            onNodeClick={(event, node) => setSelectedNode(node.data)}
           />
         </div>
       )}
