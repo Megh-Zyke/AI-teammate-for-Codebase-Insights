@@ -155,11 +155,9 @@ export default function OutputDisplay({ output, role }) {
         })
         .then((res) => {
           setFileInfo(res.data);
-          console.log("File info fetched:", res.data);
           setFetchingFileInfo(false);
         })
         .catch((err) => {
-          console.error("Error fetching file info:", err);
           setFileInfo(null);
           setFetchingFileInfo(false);
         });
