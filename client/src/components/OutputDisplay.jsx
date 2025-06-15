@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import ReactFlow, { Handle, Position } from "reactflow";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -6,21 +6,22 @@ import axios from "axios";
 import dagre from "dagre";
 import "reactflow/dist/style.css";
 import "../css/nodeStyles.css";
+import ReactMarkdown from "react-markdown";
 
 const nodeWidth = 80;
 const nodeHeight = 80;
 
 const CircularNode = ({ data, selected }) => {
   const getColor = () => {
-    if (selected) return "#ec4899"; // pink
+    if (selected) return "#3b82f6"; // blue if selected
     if (data.role !== data.category) return "#d1d5db"; // gray if not matching role
     switch (data.category) {
       case "frontend":
-        return "#3b82f6"; // blue
+        return "#10b981"; // green
       case "backend":
         return "#10b981"; // green
       case "ai":
-        return "#facc15"; // yellow
+        return "#10b981"; // green
       default:
         return "#9ca3af"; // default gray
     }
@@ -86,9 +87,40 @@ function getLayoutedGraph(nodes, edges, role, direction = "TB") {
   });
 }
 
-function ViewCode({ content, fileExtension }) {
+function ViewCode({
+  content,
+  fileExtension,
+  setSelectedCode,
+  setButton,
+  button,
+  setExplanation,
+}) {
+  const codeRef = useRef(null);
+
+  useEffect(() => {
+    const handleSelection = () => {
+      const selection = window.getSelection();
+      const selectedText = selection?.toString();
+
+      if (selectedText && codeRef.current?.contains(selection.anchorNode)) {
+        setButton(true);
+        setSelectedCode(selectedText);
+        setExplanation("");
+      } else {
+        setButton(false);
+        setSelectedCode("");
+      }
+    };
+
+    document.addEventListener("mouseup", handleSelection);
+    return () => {
+      document.removeEventListener("mouseup", handleSelection);
+    };
+  }, [button]);
+
   return (
     <div
+      ref={codeRef}
       style={{
         background: "#fff",
         borderRadius: "8px",
@@ -96,22 +128,21 @@ function ViewCode({ content, fileExtension }) {
         border: "1px solid #e5e7eb",
       }}
     >
-      {
-        <div style={{ maxHeight: "500px", overflowY: "auto" }}>
-          <SyntaxHighlighter
-            language={fileExtension} // change as needed
-            style={oneLight}
-            showLineNumbers
-            wrapLongLines
-            customStyle={{
-              fontSize: "0.85rem",
-              borderRadius: "6px",
-            }}
-          >
-            {content}
-          </SyntaxHighlighter>
-        </div>
-      }
+      <div style={{ maxHeight: "500px", overflowY: "auto" }}>
+        <SyntaxHighlighter
+          language={fileExtension}
+          style={oneLight}
+          showLineNumbers
+          wrapLongLines
+          customStyle={{
+            fontSize: "0.85rem",
+            borderRadius: "6px",
+          }}
+          lineNumbersContainerStyle={{ userSelect: "none" }}
+        >
+          {content}
+        </SyntaxHighlighter>
+      </div>
     </div>
   );
 }
@@ -133,9 +164,13 @@ export default function OutputDisplay({ output, role }) {
   const [selectedNode, setSelectedNode] = useState(null);
   const [fileInfo, setFileInfo] = useState(null);
   const [fetchingFileInfo, setFetchingFileInfo] = useState(null);
+  const [selectedCode, setSelectedCode] = useState("");
+  const [button, setButton] = useState(false);
+  const [explanation, setExplanation] = useState("");
 
   useEffect(() => {
     if (selectedNode?.repo_path && selectedNode?.label) {
+      setExplanation("");
       setFetchingFileInfo(true);
       const parts = selectedNode.repo_path.replace(/\\/g, "/").split("/");
       const repoName = parts[parts.indexOf("user_repos") + 1]
@@ -163,6 +198,26 @@ export default function OutputDisplay({ output, role }) {
         });
     }
   }, [selectedNode]);
+
+  const explainCode = () => {
+    if (selectedCode) {
+      axios
+        .post("http://localhost:8000/api/explain_code/", {
+          chunk: selectedCode,
+          code: fileInfo.content,
+        })
+        .then((res) => {
+          console.log("Explanation:", res.data);
+          // Optionally: set explanation to a state
+          setExplanation(res.data.explanation);
+          console.log("Explanation set:", res.data.explanation);
+        })
+        .catch((err) => {
+          console.error("Error explaining code:", err);
+        });
+    }
+  };
+
   return (
     <>
       {layouted && (
@@ -202,6 +257,10 @@ export default function OutputDisplay({ output, role }) {
               <ViewCode
                 content={fileInfo.content}
                 fileExtension={fileInfo.file_name.split(".").at(-1)}
+                setSelectedCode={setSelectedCode}
+                setButton={setButton}
+                button={button}
+                setExplanation={setExplanation}
               />
             </div>
 
@@ -237,6 +296,38 @@ export default function OutputDisplay({ output, role }) {
                 <br />
                 {fileInfo.key_components}
               </p>
+
+              {button && (
+                <>
+                  <button
+                    onClick={() => {
+                      explainCode();
+                    }}
+                    style={{
+                      marginTop: "0.5rem",
+                      padding: "0.25rem 0.5rem",
+                      backgroundColor: "#3b82f6",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Explain Selected Code
+                  </button>
+                </>
+              )}
+
+              {explanation && (
+                <div style={{ marginTop: "1rem" }}>
+                  <h4>Explanation</h4>
+                  {explanation ? (
+                    <ReactMarkdown>{explanation}</ReactMarkdown>
+                  ) : (
+                    <p>No explanation available.</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )
