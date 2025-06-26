@@ -40,6 +40,8 @@ def get_commit_numbers(repo: str) -> list:
         return [commit.sha for commit in commits]
     except Exception as e:
         return f"Error fetching commit numbers: {str(e)}"
+
+        
     
 @mcp.tool()
 def get_commit_details(repo: str, commit_sha: str) -> str:
