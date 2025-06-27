@@ -28,6 +28,9 @@ Role-Specific Notes:
 - AI/ML: <data/model/pipeline insights if relevant>
 - Product: <business impact and technical debt if relevant>
 
+If it a combination of roles and contains AI/ML chunk, classify it as "ai".
+If it is a combination of roles and does not contain AI/ML chunk, classify it as "hybrid".
+
 Classification Guidelines:
 
 Frontend: UI components, styling, user interactions, client-side logic, browser APIs
