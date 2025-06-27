@@ -46,7 +46,11 @@ const ViewCommits = ({ RepoName }) => {
     if (!RepoName) return;
     fetchCommits();
   }, [RepoName]);
+
   const handleCommitClick = (commit) => {
+    setSelectedCommit(null);
+    setSelectedFile(null);
+
     axios
       .get("http://localhost:8000/api/get_commit_details/", {
         params: { repo: RepoName, commit_sha: commit.sha },
@@ -80,63 +84,67 @@ const ViewCommits = ({ RepoName }) => {
 
       {selectedCommit && (
         <div className="commit-details">
-          <h3>Commit Details</h3>
-          <p>
-            <strong>SHA:</strong> {selectedCommit.commit_sha}
-          </p>
-          <p>
-            <strong>Author:</strong> {selectedCommit.author}
-          </p>
-          <p>
-            <strong>Message:</strong> {selectedCommit.message}
-          </p>
-          <p>
-            <strong>Stats:</strong>
-            <ul>
-              <li>Total: {selectedCommit.stats.total}</li>
-              <li>Additions: {selectedCommit.stats.additions}</li>
-              <li>Deletions: {selectedCommit.stats.deletions}</li>
-            </ul>
-          </p>
-
-          <div className="files-section">
-            <h4>Changed Files:</h4>
-            <ul className="file-list">
-              {Object.entries(selectedCommit.files_changed).map(
-                ([filename, fileData], i) => (
-                  <li
-                    key={i}
-                    onClick={() => setSelectedFile({ filename, ...fileData })}
-                  >
-                    <strong>{filename}</strong> - (+{fileData.additions}, -
-                    {fileData.deletions})
-                  </li>
-                )
-              )}
-            </ul>
+          <div className="left-panel">
+            <h3>Commit Details</h3>
+            <p>
+              <strong>SHA:</strong> {selectedCommit.commit_sha}
+            </p>
+            <p>
+              <strong>Author:</strong> {selectedCommit.author}
+            </p>
+            <p>
+              <strong>Message:</strong> {selectedCommit.message}
+            </p>
+            <p>
+              <strong>Stats:</strong>
+              <ul>
+                <li>Total: {selectedCommit.stats.total}</li>
+                <li>Additions: {selectedCommit.stats.additions}</li>
+                <li>Deletions: {selectedCommit.stats.deletions}</li>
+              </ul>
+            </p>
+            <div className="files-section">
+              <h4>Changed Files:</h4>
+              <ul className="file-list">
+                {Object.entries(selectedCommit.files_changed).map(
+                  ([filename, fileData], i) => (
+                    <li
+                      key={i}
+                      onClick={() => setSelectedFile({ filename, ...fileData })}
+                    >
+                      <strong>{filename}</strong> - (+{fileData.additions}, -
+                      {fileData.deletions})
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>
           </div>
 
-          {selectedFile && selectedFile.patch && (
-            <div className="file-patch">
-              <h4>Changes in {selectedFile.filename}:</h4>
-              <SyntaxHighlighter
-                language="diff"
-                style={oneDark}
-                showLineNumbers
-                wrapLines
-              >
-                {selectedFile.patch}
-              </SyntaxHighlighter>
-            </div>
-          )}
-
-          {selectedFile && !selectedFile.patch && (
-            <div className="file-patch">
-              <p>
-                No patch available for <strong>{selectedFile.filename}</strong>.
-              </p>
-            </div>
-          )}
+          <div className="right-panel">
+            {selectedFile && selectedFile.patch ? (
+              <div className="file-patch">
+                <h4>Changes in {selectedFile.filename}:</h4>
+                <SyntaxHighlighter
+                  language="diff"
+                  style={oneDark}
+                  showLineNumbers
+                  wrapLines
+                >
+                  {selectedFile.patch}
+                </SyntaxHighlighter>
+              </div>
+            ) : (
+              selectedFile && (
+                <div className="file-patch">
+                  <p style={{ color: "white" }}>
+                    No patch available for{" "}
+                    <strong>{selectedFile.filename}</strong>.
+                  </p>
+                </div>
+              )
+            )}
+          </div>
         </div>
       )}
     </div>

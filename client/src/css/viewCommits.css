@@ -27,10 +27,28 @@
 }
 
 .commit-details {
+    display: flex;
+    gap: 20px;
     background-color: #f3f3f3;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.commit-details>.left-panel {
+    flex: 1;
+    min-width: 300px;
+}
+
+.commit-details>.right-panel {
+    flex: 1;
+    min-width: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+    background-color: #282c34;
+    border-radius: 6px;
+    padding: 10px;
 }
 
 .commit-details h3 {
@@ -40,4 +58,28 @@
 
 .commit-details p {
     margin: 6px 0;
+}
+
+.files-section h4 {
+    margin-top: 1rem;
+}
+
+.file-list li {
+    margin-bottom: 5px;
+    cursor: pointer;
+    color: #333;
+}
+
+.file-list li:hover {
+    text-decoration: underline;
+    color: #0077cc;
+}
+
+.file-patch h4 {
+    margin: 0 0 10px 0;
+    color: #ffffff;
+}
+
+.file-patch pre {
+    margin: 0;
 }
