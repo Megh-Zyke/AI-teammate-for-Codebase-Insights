@@ -3,6 +3,7 @@ import FileUploader from "./components/FileUploader";
 import RepoCloner from "./components/RepoCloner";
 import RoleSelector from "./components/RoleSelector";
 import OutputDisplay from "./components/OutputDisplay";
+import ViewCommits from "./components/ViewCommits";
 
 function App() {
   const [output, setOutput] = useState({});
@@ -15,6 +16,7 @@ function App() {
       <RepoCloner setOutput={setOutput} />
       <RoleSelector role={role} setRole={setRole} />
       <OutputDisplay output={output} role={role} />
+      <ViewCommits RepoName={output.repo_url} />
     </div>
   );
 }

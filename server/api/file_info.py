@@ -12,7 +12,6 @@ def get_file_info(path: str, label: str, table: str , abs_path = str):
     """
     conn = get_db_connection()
     cursor = conn.cursor()
-    
     query = f"SELECT * FROM {table} WHERE file_path = %s AND file_name = %s"
     cursor.execute(query, (path, label))
     file_info = cursor.fetchone()

@@ -184,7 +184,7 @@ export default function OutputDisplay({ output, role }) {
           params: {
             path: filePath,
             label: label,
-            table: repoName,
+            table: repoName.replace(/-/g, "_"),
             abs_path: selectedNode.abs_path.replace(/\\/g, "/"),
           },
         })
