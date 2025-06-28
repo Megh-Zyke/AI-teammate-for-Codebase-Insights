@@ -97,7 +97,7 @@ const ViewCommits = ({ RepoName }) => {
             </p>
             <p>
               <strong>Stats:</strong>
-              <ul>
+              <ul className="stats-list">
                 <li>Total: {selectedCommit.stats.total}</li>
                 <li>Additions: {selectedCommit.stats.additions}</li>
                 <li>Deletions: {selectedCommit.stats.deletions}</li>

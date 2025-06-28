@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import "../css/FileUploader.css";
 
 export default function RepoCloner({ setOutput }) {
   const [url, setUrl] = useState("");
@@ -15,11 +16,12 @@ export default function RepoCloner({ setOutput }) {
   };
 
   return (
-    <div style={{ marginBottom: "16px" }}>
+    <div style={{ marginBottom: "16px" }} className="file-uploader">
       <input
         type="text"
         placeholder="GitHub Repo URL"
         onChange={(e) => setUrl(e.target.value)}
+        className="file-uploader-input"
       />
       <button onClick={handleClone}>
         {loading ? <span>Cloning...</span> : <span>Clone Repo</span>}

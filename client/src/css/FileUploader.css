@@ -1,0 +1,10 @@
+.file-uploader {
+    width: 100%;
+    display: flex;
+}
+
+.file-uploader-input {
+    flex: 1;
+    padding: 10px;
+
+}

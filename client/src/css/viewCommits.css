@@ -11,19 +11,12 @@
 .view-commits ul {
     list-style: none;
     padding: 0;
-    margin-bottom: 1.5rem;
 }
 
 .view-commits li {
     margin-bottom: 10px;
     cursor: pointer;
     color: #1e90ff;
-    transition: color 0.2s;
-}
-
-.view-commits li:hover {
-    text-decoration: underline;
-    color: #104e8b;
 }
 
 .commit-details {
@@ -82,4 +75,10 @@
 
 .file-patch pre {
     margin: 0;
+}
+
+.stats-list {
+    list-style: none;
+    display: flex;
+    gap: 15px;
 }
