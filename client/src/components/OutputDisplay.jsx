@@ -22,8 +22,8 @@ const CircularNode = ({ data, selected }) => {
         return "#10b981"; // green
       case "ai":
         return "#10b981"; // green
-      default:
-        return "#9ca3af"; // default gray
+      case "hybrid":
+        return "#10b981"; // default gray
     }
   };
 
