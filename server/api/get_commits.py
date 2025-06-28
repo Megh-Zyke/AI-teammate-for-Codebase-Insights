@@ -54,3 +54,13 @@ def get_commit_details(repo: str, commit_sha: str):
     except Exception as e:
         print("Error in get_commit_details:", e)
         raise HTTPException(status_code=500, detail=f"Error fetching commit details: {str(e)}")
+    
+
+@router.get("/list_branches/")
+def list_branches(repo: str):
+    try:
+        repository = g.get_repo(repo)
+        branches = repository.get_branches()
+        return [branch.name for branch in branches]
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
