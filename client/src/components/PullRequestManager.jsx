@@ -7,7 +7,6 @@ const PullRequestManager = ({ repo: initialRepo }) => {
   const [pulls, setPulls] = useState([]);
   const [selectedPR, setSelectedPR] = useState(null);
   const [state, setState] = useState("open");
-  const [prNumber, setPrNumber] = useState("");
   const [branches, setBranches] = useState([]);
   const [createPR, setCreatePR] = useState(false);
   const [selectedPRNumber, setSelectedPRNumber] = useState(null);
@@ -76,7 +75,6 @@ const PullRequestManager = ({ repo: initialRepo }) => {
 
   const handlePRclick = (prNumber) => {
     setSelectedPRNumber(prNumber);
-    setPrNumber(prNumber);
     fetchPullRequestDetails(prNumber);
   };
   return (
@@ -116,7 +114,23 @@ const PullRequestManager = ({ repo: initialRepo }) => {
 
       {selectedPR && (
         <div className="pr-details">
-          <h3>PR Details</h3>
+          <div className="pr-details-header">
+            <div>
+              <h3>PR Details</h3>
+            </div>
+            <div>
+              <button
+                className="close-pr-form"
+                onClick={() => {
+                  setSelectedPR(null);
+                  setSelectedPRNumber(null);
+                }}
+              >
+                x
+              </button>
+            </div>
+          </div>
+
           <p>
             <strong>Title:</strong> {selectedPR.title}
           </p>
