@@ -13,21 +13,34 @@ const PullRequestManager = ({ repo: initialRepo }) => {
   const [createPRoutput, setCreatePRoutput] = useState(null);
 
   useEffect(() => {
+    // Initialize the repo state when the component mounts
+    // This ensures that the component has the initial repo value
     setRepo(initialRepo);
+
+    // Fetch pull requests and branches for the initial repo
     if (initialRepo) {
       fetchPullRequests(initialRepo, state);
       getBranchs(initialRepo);
     }
   }, [initialRepo]);
 
+  // Fetch branches when the state of the PR changes
   useEffect(() => {
-    if (repo) {
-      fetchPullRequests(repo, state);
+    if (initialRepo) {
+      fetchPullRequests(initialRepo, state);
     }
     setSelectedPR(null);
     setSelectedPRNumber(null);
   }, [state]);
 
+  // Reset createPRoutput when createPR changes
+  useEffect(() => {
+    setCreatePRoutput(null);
+  }, [createPR]);
+
+  // Function to fetch branches for the selected repository
+  // It uses axios to make a GET request to the backend API
+  // and updates the branches state with the response data
   const getBranchs = async (repo) => {
     try {
       const response = await axios.get(
@@ -62,6 +75,12 @@ const PullRequestManager = ({ repo: initialRepo }) => {
     }
   };
 
+  // Function to fetch details of a specific pull request
+  // It takes the pull request number as an argument
+  // and makes a GET request to the backend API
+  // to retrieve the details of the pull request
+  // The response data is then set to the selectedPR state
+  // This function is called when a pull request is clicked
   const fetchPullRequestDetails = async (number) => {
     try {
       const response = await axios.get(
@@ -130,10 +149,15 @@ const PullRequestManager = ({ repo: initialRepo }) => {
     }
   };
 
+  // Function to handle click on a pull request item
+  // It sets the selectedPRNumber state to the clicked PR number
+  // and fetches the details of the selected pull request
   const handlePRclick = (prNumber) => {
     setSelectedPRNumber(prNumber);
     fetchPullRequestDetails(prNumber);
   };
+
+  // Render the component
   return (
     <div className="pr-container">
       <h2>Pull Request Manager</h2>
@@ -262,7 +286,15 @@ const PullRequestManager = ({ repo: initialRepo }) => {
             </div>
             <div className="form-group">
               <label>Base Branch:</label>
-              <input type="text" name="base" required />
+
+              <select name="base" required>
+                <option value="">Select a branch</option>
+                {branches.map((branch, index) => (
+                  <option key={index} value={branch}>
+                    {branch}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="submitBtn">
