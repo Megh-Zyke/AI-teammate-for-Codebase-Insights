@@ -5,6 +5,7 @@ import "../css/FileUploader.css";
 export default function RepoCloner({ setOutput }) {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleClone = async () => {
     setLoading(true);

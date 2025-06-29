@@ -190,7 +190,7 @@ const PullRequestManager = ({ repo: initialRepo }) => {
                     "Content-Type": "application/json",
                   },
                   body: JSON.stringify({
-                    repo,
+                    repo: repo,
                     title: e.target.title.value,
                     body: e.target.body.value,
                     head: e.target.head.value,
