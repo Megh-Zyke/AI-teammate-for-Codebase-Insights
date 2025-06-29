@@ -19,9 +19,10 @@ def clone_endpoint(payload: RepoRequest):
     try:
         results = enrich_and_store(repo_path)
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        return {"status": "error_enrich", "message": str(e)}
     
     # Prepare the response
     results["status"] = "success"
     results["repo"] = os.path.basename(repo_path)
+    results["repo_url"]  = payload.repo_url.replace("https://github.com/", "")
     return results

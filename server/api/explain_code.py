@@ -8,6 +8,8 @@ router = APIRouter()
 class CodeRequest(BaseModel):
     chunk: str
     code : str
+    file_category: str 
+    user_role: str
 
 @router.post("/explain_code/")
 def explain_code_endpoint(payload: CodeRequest):
@@ -15,7 +17,7 @@ def explain_code_endpoint(payload: CodeRequest):
     Endpoint to explain a code chunk using LLM.
     """
     try:
-        explanation = code_explaination(payload.chunk, payload.code)
+        explanation = code_explaination(payload.chunk, payload.code , payload.file_category, payload.user_role)
         explanation = explanation.replace("```json" , "").replace("```", "").strip()
         explanation = json.loads(explanation)
         explanation = explanation.get('Explanation', explanation)

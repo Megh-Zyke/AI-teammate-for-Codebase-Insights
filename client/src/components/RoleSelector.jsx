@@ -5,7 +5,8 @@ export default function RoleSelector({ role, setRole }) {
         <option value="">Select Role</option>
         <option value="backend">Backend Developer</option>
         <option value="frontend">Frontend Developer</option>
-        <option value="pm">Product Manager</option>
+        <option value="hybrid">Hybrid</option>
+        <option value="ai">AI/ML </option>
       </select>
     </div>
   );

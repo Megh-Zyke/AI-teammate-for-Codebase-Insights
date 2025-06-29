@@ -1,0 +1,143 @@
+/* PullRequestManager.css */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.input-field,
+.select-field {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.create-pr-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.pr-list {
+    margin-top: 20px;
+}
+
+.pr-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+
+.pr-card:hover {
+    background-color: #f0f0f0;
+}
+
+.pr-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.pr-item:hover {
+    background-color: #f0f0f0;
+}
+
+.pr-item.active {
+    background-color: #f0f0f0;
+}
+
+.pr-details-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.pr-details {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    background-color: #e9f3ff;
+}
+
+.pr-details p {
+    margin: 5px 0;
+}
+
+.form-group {
+    display: flex;
+    width: 100%;
+    margin: 1% 0;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.form-group textarea {
+    height: 100px;
+}
+
+.form-group label {
+    flex: 0 0 150px;
+    font-weight: bold;
+}
+
+.submitBtn {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.SubmitPRButton {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 auto;
+    transition: ease 0.3s;
+}
+
+.SubmitPRButton:hover {
+    background-color: #218838;
+}
+
+.close-pr-form {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    margin: 0 auto;
+    transition: ease 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-pr-form:hover {
+    background-color: #c82333;
+}

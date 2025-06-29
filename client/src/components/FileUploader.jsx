@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import "../css/FileUploader.css";
 
 export default function FileUploader({ setOutput }) {
   const [file, setFile] = useState(null);
@@ -16,8 +17,12 @@ export default function FileUploader({ setOutput }) {
   };
 
   return (
-    <div style={{ marginBottom: "16px" }}>
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+    <div style={{ marginBottom: "16px" }} className="file-uploader">
+      <input
+        className="file-uploader-input"
+        type="file"
+        onChange={(e) => setFile(e.target.files[0])}
+      />
       <button onClick={handleUpload}>Upload ZIP</button>
     </div>
   );
