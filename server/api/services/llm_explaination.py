@@ -5,37 +5,43 @@ import os
 
 load_dotenv()
 
-def code_explaination(chunk, code):
+def code_explaination(chunk, code, file_category, user_role):
     client = genai.Client(
         api_key=os.getenv("GOOGLE_API_KEY_CODE"),
     )
-    prompt = """You are a codebase analysis assistant. Given a code chunk and its full codefile context, provide a detailed, role-specific explanation covering:
+    prompt = """You are a codebase analysis assistant. Given a selected code chunk and the full context of the file it belongs to, generate a **concise, role-specific explanation**.
 
-- How the chunk fits and functions within the full codefile  
-- Key dependencies, integrations, and data flows related to the chunk  
-- Its significance to the overall project or system  
-- Potential issues or risks
-- Any architectural decisions or patterns it exemplifies
+Your response should focus on what is **relevant and actionable** for the user's role. Be technical where needed, but avoid unnecessary verbosity or unrelated details.
 
+A category of the file and the user's role are provided. Use them to **tailor the tone, depth, and content** of your explanation.
 
-Assume the user may lack full knowledge of the codebase, so be clear and thorough. But keep in mind that the user is a developer familiar with programming concepts. Keep the explanation concise but informative, focusing on technical details relevant to developers. Respond with the same level of complexity as the provided code chunk.
+Please include only the most pertinent insights on:
+- The function and purpose of the selected code chunk within the file
+- How it connects to other parts of the system (e.g., APIs, UI components, models, services)
+- Why this chunk matters to the current role
+- Risks or red flags (if any), from the lens of the user's role
+- Notable design patterns or architecture only if highly relevant
 
-Input:
+Do **not** explain unrelated parts of the code or general programming concepts the user is likely to know already.
+
+**Input:**
 Code Chunk:
 {chunk}
 
 Full Codefile Context:
 {full_codefile_context}
 
-Output (JSON):
-{{
-  "Explanation": "detailed explanation of the chunk's purpose and role"
-}}
+File Category: {file_category}
 
-Make sure to provide a comprehensive, technical explanation that covers all relevant aspects of the code chunk and its context. 
+User Role: {user_role}
+
+**Output (JSON):**
+{{
+  "Explanation": "A focused, role-aware explanation of the chunk"
+}}
 """
     # Format the prompt with the actual chunk and code
-    formatted_prompt = prompt.format(chunk=chunk, full_codefile_context=code)
+    formatted_prompt = prompt.format(chunk=chunk, full_codefile_context=code , file_category=file_category, user_role=user_role)
 
     contents = [
         types.Content(
@@ -58,4 +64,4 @@ Make sure to provide a comprehensive, technical explanation that covers all rele
     ):
         full_response += chunk_response.text
 
-    return full_response
+    return full_response    

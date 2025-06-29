@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef, use } from "react";
 import ReactFlow, { Handle, Position } from "reactflow";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -167,6 +167,11 @@ export default function OutputDisplay({ output, role }) {
   const [selectedCode, setSelectedCode] = useState("");
   const [button, setButton] = useState(false);
   const [explanation, setExplanation] = useState("");
+  const [userRole, setUserRole] = useState(role);
+
+  useEffect(() => {
+    setUserRole(role);
+  }, [role]);
 
   useEffect(() => {
     if (selectedNode?.repo_path && selectedNode?.label) {
@@ -201,10 +206,16 @@ export default function OutputDisplay({ output, role }) {
 
   const explainCode = () => {
     if (selectedCode) {
+      console.log("Selected Code:", selectedCode);
+      console.log("File Info:", fileInfo.content);
+      console.log("User Role:", userRole);
+      console.log("file_category:", fileInfo.file_category);
       axios
         .post("http://localhost:8000/api/explain_code/", {
           chunk: selectedCode,
           code: fileInfo.content,
+          file_category: fileInfo.file_category,
+          user_role: userRole,
         })
         .then((res) => {
           console.log("Explanation:", res.data);
