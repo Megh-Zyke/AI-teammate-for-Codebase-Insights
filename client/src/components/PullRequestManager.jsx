@@ -10,6 +10,7 @@ const PullRequestManager = ({ repo: initialRepo }) => {
   const [branches, setBranches] = useState([]);
   const [createPR, setCreatePR] = useState(false);
   const [selectedPRNumber, setSelectedPRNumber] = useState(null);
+  const [createPRoutput, setCreatePRoutput] = useState(null);
 
   useEffect(() => {
     setRepo(initialRepo);
@@ -70,6 +71,62 @@ const PullRequestManager = ({ repo: initialRepo }) => {
       setSelectedPR(response.data);
     } catch (error) {
       console.error("Error fetching PR details:", error);
+    }
+  };
+
+  // Function to handle creating a pull request
+  // It takes the event object as an argument
+  // and prevents the default form submission behavior
+  const handleCreatePR = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        `http://localhost:8000/api/create_pull_request/`,
+        {
+          repo: repo,
+          title: e.target.title.value,
+          body: e.target.body.value,
+          head: e.target.head.value,
+          base: e.target.base.value,
+        }
+      );
+
+      console.log("PR created successfully");
+      setCreatePRoutput({
+        error: false,
+        detail: "Successfully created PR ",
+      });
+    } catch (error) {
+      console.error("Error creating PR:", error);
+
+      let errorMsg = "Unknown error occurred.";
+
+      try {
+        const errorDetail = error.response?.data?.detail || "Unknown error";
+
+        // Extract JSON part safely
+        const jsonStart = errorDetail.indexOf("{");
+        const jsonEnd = errorDetail.lastIndexOf("}") + 1;
+        const jsonString = errorDetail.substring(jsonStart, jsonEnd);
+        const parsedError = JSON.parse(jsonString);
+
+        const status = parsedError.status || "Unknown";
+        const message = parsedError.message || "Validation Failed";
+        const details =
+          parsedError.errors?.map((err) => err.message).join(" | ") || "";
+
+        errorMsg = `${message} Error: ${status}\n\n${details}`;
+      } catch (err) {
+        // Fallback in case parsing fails
+        errorMsg = error.response?.data?.detail || "Unknown error occurred.";
+      }
+
+      console.log("Error details:", errorMsg);
+      setCreatePRoutput({
+        error: true,
+        detail: errorMsg,
+      });
     }
   };
 
@@ -181,25 +238,7 @@ const PullRequestManager = ({ repo: initialRepo }) => {
 
           <form
             onSubmit={async (e) => {
-              e.preventDefault();
-              const response = await fetch(
-                `http://localhost:8000/api/create_pull_request/`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    repo: repo,
-                    title: e.target.title.value,
-                    body: e.target.body.value,
-                    head: e.target.head.value,
-                    base: e.target.base.value,
-                  }),
-                }
-              );
-              const data = await response.json();
-              alert(data.message);
+              handleCreatePR(e);
             }}
           >
             <div className="form-group">
@@ -232,6 +271,20 @@ const PullRequestManager = ({ repo: initialRepo }) => {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {createPR && createPRoutput && (
+        <div
+          className={`create-pr-output ${
+            createPRoutput.error ? "error" : "success"
+          }`}
+        >
+          {createPRoutput.error ? (
+            <p className="error-msg-pr">{createPRoutput.detail}</p>
+          ) : (
+            <p className="success-msg-pr">Success: {createPRoutput.detail}</p>
+          )}
         </div>
       )}
     </div>

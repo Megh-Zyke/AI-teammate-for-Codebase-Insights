@@ -141,3 +141,14 @@
 .close-pr-form:hover {
     background-color: #c82333;
 }
+
+.error-msg-pr {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}
+
+.success-msg-pr {
+    color: green;
+    font-weight: bold;
+}
