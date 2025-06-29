@@ -55,6 +55,8 @@ def get_pull_request(repo: str, number: int):
 def create_pull_request(data: PullRequestCreate):
     try:
         repo = g.get_repo(data.repo)
+
+        
         pr = repo.create_pull(
             title=data.title,
             body=data.body,

@@ -10,23 +10,37 @@ const PullRequestManager = ({ repo: initialRepo }) => {
   const [branches, setBranches] = useState([]);
   const [createPR, setCreatePR] = useState(false);
   const [selectedPRNumber, setSelectedPRNumber] = useState(null);
+  const [createPRoutput, setCreatePRoutput] = useState(null);
 
   useEffect(() => {
+    // Initialize the repo state when the component mounts
+    // This ensures that the component has the initial repo value
     setRepo(initialRepo);
+
+    // Fetch pull requests and branches for the initial repo
     if (initialRepo) {
       fetchPullRequests(initialRepo, state);
       getBranchs(initialRepo);
     }
   }, [initialRepo]);
 
+  // Fetch branches when the state of the PR changes
   useEffect(() => {
-    if (repo) {
-      fetchPullRequests(repo, state);
+    if (initialRepo) {
+      fetchPullRequests(initialRepo, state);
     }
     setSelectedPR(null);
     setSelectedPRNumber(null);
   }, [state]);
 
+  // Reset createPRoutput when createPR changes
+  useEffect(() => {
+    setCreatePRoutput(null);
+  }, [createPR]);
+
+  // Function to fetch branches for the selected repository
+  // It uses axios to make a GET request to the backend API
+  // and updates the branches state with the response data
   const getBranchs = async (repo) => {
     try {
       const response = await axios.get(
@@ -61,6 +75,12 @@ const PullRequestManager = ({ repo: initialRepo }) => {
     }
   };
 
+  // Function to fetch details of a specific pull request
+  // It takes the pull request number as an argument
+  // and makes a GET request to the backend API
+  // to retrieve the details of the pull request
+  // The response data is then set to the selectedPR state
+  // This function is called when a pull request is clicked
   const fetchPullRequestDetails = async (number) => {
     try {
       const response = await axios.get(
@@ -73,10 +93,71 @@ const PullRequestManager = ({ repo: initialRepo }) => {
     }
   };
 
+  // Function to handle creating a pull request
+  // It takes the event object as an argument
+  // and prevents the default form submission behavior
+  const handleCreatePR = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        `http://localhost:8000/api/create_pull_request/`,
+        {
+          repo: repo,
+          title: e.target.title.value,
+          body: e.target.body.value,
+          head: e.target.head.value,
+          base: e.target.base.value,
+        }
+      );
+
+      console.log("PR created successfully");
+      setCreatePRoutput({
+        error: false,
+        detail: "Successfully created PR ",
+      });
+    } catch (error) {
+      console.error("Error creating PR:", error);
+
+      let errorMsg = "Unknown error occurred.";
+
+      try {
+        const errorDetail = error.response?.data?.detail || "Unknown error";
+
+        // Extract JSON part safely
+        const jsonStart = errorDetail.indexOf("{");
+        const jsonEnd = errorDetail.lastIndexOf("}") + 1;
+        const jsonString = errorDetail.substring(jsonStart, jsonEnd);
+        const parsedError = JSON.parse(jsonString);
+
+        const status = parsedError.status || "Unknown";
+        const message = parsedError.message || "Validation Failed";
+        const details =
+          parsedError.errors?.map((err) => err.message).join(" | ") || "";
+
+        errorMsg = `${message} Error: ${status}\n\n${details}`;
+      } catch (err) {
+        // Fallback in case parsing fails
+        errorMsg = error.response?.data?.detail || "Unknown error occurred.";
+      }
+
+      console.log("Error details:", errorMsg);
+      setCreatePRoutput({
+        error: true,
+        detail: errorMsg,
+      });
+    }
+  };
+
+  // Function to handle click on a pull request item
+  // It sets the selectedPRNumber state to the clicked PR number
+  // and fetches the details of the selected pull request
   const handlePRclick = (prNumber) => {
     setSelectedPRNumber(prNumber);
     fetchPullRequestDetails(prNumber);
   };
+
+  // Render the component
   return (
     <div className="pr-container">
       <h2>Pull Request Manager</h2>
@@ -181,25 +262,7 @@ const PullRequestManager = ({ repo: initialRepo }) => {
 
           <form
             onSubmit={async (e) => {
-              e.preventDefault();
-              const response = await fetch(
-                `http://localhost:8000/api/create_pull_request/`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    repo,
-                    title: e.target.title.value,
-                    body: e.target.body.value,
-                    head: e.target.head.value,
-                    base: e.target.base.value,
-                  }),
-                }
-              );
-              const data = await response.json();
-              alert(data.message);
+              handleCreatePR(e);
             }}
           >
             <div className="form-group">
@@ -223,7 +286,15 @@ const PullRequestManager = ({ repo: initialRepo }) => {
             </div>
             <div className="form-group">
               <label>Base Branch:</label>
-              <input type="text" name="base" required />
+
+              <select name="base" required>
+                <option value="">Select a branch</option>
+                {branches.map((branch, index) => (
+                  <option key={index} value={branch}>
+                    {branch}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="submitBtn">
@@ -232,6 +303,20 @@ const PullRequestManager = ({ repo: initialRepo }) => {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {createPR && createPRoutput && (
+        <div
+          className={`create-pr-output ${
+            createPRoutput.error ? "error" : "success"
+          }`}
+        >
+          {createPRoutput.error ? (
+            <p className="error-msg-pr">{createPRoutput.detail}</p>
+          ) : (
+            <p className="success-msg-pr">Success: {createPRoutput.detail}</p>
+          )}
         </div>
       )}
     </div>
